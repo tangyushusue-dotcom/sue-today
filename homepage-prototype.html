@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sue的今天 · 女生的一天，从这里开始</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans SC"', 'system-ui', 'sans-serif'],
+            serif: ['"Noto Serif SC"', 'Georgia', 'serif'],
+          },
+          colors: {
+            cream: '#FFF8F3',
+            blush: '#FBEAE4',
+            rose:  '#F4A6A0',
+            terracotta: '#E7A08C',
+            sage:  '#A9C5A0',
+            sky:   '#A7C4D4',
+            peach: '#F6C8A8',
+            ink:   '#5B5048',
+            muted: '#A89C92',
+          },
+          boxShadow: {
+            soft: '0 10px 40px -12px rgba(180,140,120,0.25)',
+            card: '0 6px 24px -10px rgba(180,140,120,0.30)',
+          },
+          borderRadius: { '4xl': '2rem' },
+        },
+      },
+    };
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background: linear-gradient(180deg, #FFF8F3 0%, #FCEFE9 55%, #F7E7DF 100%); }
+    .blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: .5; z-index: 0; pointer-events: none; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp .7s cubic-bezier(.22,.61,.36,1) both; }
+    .delay-1 { animation-delay: .08s; }
+    .delay-2 { animation-delay: .16s; }
+    .delay-3 { animation-delay: .24s; }
+    .delay-4 { animation-delay: .32s; }
+    .card-hover { transition: transform .35s cubic-bezier(.22,.61,.36,1), box-shadow .35s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 18px 50px -16px rgba(180,140,120,.40); }
+    .quote-fade { transition: opacity .6s ease; }
+    .toast {
+      position: fixed; left: 50%; bottom: 36px; transform: translateX(-50%) translateY(20px);
+      background: rgba(91,80,72,.92); color: #fff; padding: 12px 22px; border-radius: 999px;
+      font-size: 14px; opacity: 0; transition: all .4s ease; z-index: 50; backdrop-filter: blur(6px);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body class="font-sans text-ink antialiased min-h-screen">
+  <!-- 柔和光斑背景 -->
+  <div class="blob bg-rose/40 w-72 h-72 -top-16 -left-20"></div>
+  <div class="blob bg-peach/40 w-80 h-80 top-40 -right-24"></div>
+  <div class="blob bg-sky/30 w-64 h-64 bottom-10 left-10"></div>
+
+  <main class="relative z-10 mx-auto max-w-3xl px-5 pb-16 pt-8 sm:pt-12">
+
+    <!-- 顶部栏 -->
+    <header class="fade-up flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="grid h-9 w-9 place-items-center rounded-2xl bg-white/70 shadow-card text-rose text-lg">🌸</div>
+        <span class="font-serif text-lg font-medium tracking-wide">Sue的今天</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="hidden items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 text-xs text-muted shadow-card sm:flex">
+          <span class="text-rose">🔥</span> 连续打开 <span id="streak" class="font-medium text-ink">3</span> 天
+        </div>
+        <button onclick="toast('设置在这里哦～')" class="grid h-9 w-9 place-items-center rounded-2xl bg-white/70 text-muted shadow-card hover:text-ink">⚙️</button>
+      </div>
+    </header>
+
+    <!-- 问候区 -->
+    <section class="fade-up delay-1 mt-10 sm:mt-14">
+      <p id="dateLabel" class="text-sm tracking-wide text-muted">2025年7月27日 · 星期日</p>
+      <h1 id="greeting" class="mt-2 font-serif text-3xl font-medium leading-snug sm:text-4xl">下午好，今天也想好好照顾自己呀</h1>
+      <p id="quote" class="quote-fade mt-4 max-w-xl font-serif text-base italic leading-relaxed text-terracotta">“把今天过成自己喜欢的样子，就是一种温柔的自律。”</p>
+    </section>
+
+    <!-- 三个核心入口 -->
+    <section class="mt-10 grid gap-4 sm:mt-12 sm:grid-cols-2">
+
+      <!-- ① 今天要做什么 -->
+      <button onclick="toast('正在为你打开「今天计划」…')"
+        class="card-hover fade-up delay-2 group flex flex-col items-start rounded-4xl border border-white/60 bg-white/75 p-6 text-left shadow-card backdrop-blur sm:col-span-2">
+        <div class="flex w-full items-center justify-between">
+          <span class="grid h-11 w-11 place-items-center rounded-2xl bg-rose/15 text-2xl">📝</span>
+          <span class="translate-x-1 text-muted opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100">→</span>
+        </div>
+        <h2 class="mt-4 font-serif text-xl font-medium">今天要做什么？</h2>
+        <p class="mt-1.5 text-sm leading-relaxed text-muted">说一句今天的事，AI 帮你排好时间、重点和顺序。</p>
+        <p class="mt-3 rounded-2xl bg-blush/60 px-3 py-2 text-xs text-ink/70">例：「开会、健身、晚上和朋友吃饭」</p>
+      </button>
+
+      <!-- ② 今天怎么照顾自己（吃 + 运动） -->
+      <button onclick="toast('正在为你打开「今天吃什么」…')"
+        class="card-hover fade-up delay-3 group flex flex-col items-start rounded-4xl border border-white/60 bg-white/75 p-6 text-left shadow-card backdrop-blur">
+        <span class="grid h-11 w-11 place-items-center rounded-2xl bg-peach/30 text-2xl">🍲</span>
+        <h2 class="mt-4 font-serif text-xl font-medium">今天怎么照顾自己？</h2>
+        <p class="mt-1.5 text-sm leading-relaxed text-muted">吃顿舒服的，动一动身体。</p>
+        <div class="mt-4 flex flex-wrap gap-2 text-xs">
+          <span class="rounded-full bg-blush/70 px-3 py-1.5 text-ink/80">今天吃什么</span>
+          <span class="rounded-full bg-sage/20 px-3 py-1.5 text-ink/80">今日运动</span>
+        </div>
+      </button>
+
+      <!-- ③ 今天以什么状态出门 -->
+      <button onclick="toast('正在为你打开「今日形象」…')"
+        class="card-hover fade-up delay-3 group flex flex-col items-start rounded-4xl border border-white/60 bg-white/75 p-6 text-left shadow-card backdrop-blur">
+        <span class="grid h-11 w-11 place-items-center rounded-2xl bg-sky/25 text-2xl">👗</span>
+        <h2 class="mt-4 font-serif text-xl font-medium">今天以什么状态出门？</h2>
+        <p class="mt-1.5 text-sm leading-relaxed text-muted">结合天气和场景，给你穿搭与神态小建议。</p>
+        <p class="mt-4 rounded-2xl bg-blush/60 px-3 py-2 text-xs text-ink/70">今天：上班 · 约会 · 面试 · 旅行</p>
+      </button>
+    </section>
+
+    <!-- 晚间复盘（常驻，傍晚高亮） -->
+    <section class="fade-up delay-4 mt-5">
+      <button onclick="toast('晚间复盘：今天发生了什么？')"
+        class="flex w-full items-center gap-4 rounded-4xl border border-terracotta/30 bg-gradient-to-r from-blush/80 to-peach/50 p-5 text-left shadow-card backdrop-blur transition hover:shadow-soft">
+        <span class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/80 text-2xl shadow-card">🌙</span>
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <h2 class="font-serif text-lg font-medium">晚间复盘</h2>
+            <span class="rounded-full bg-terracotta/90 px-2 py-0.5 text-[10px] font-medium text-white">傍晚推荐</span>
+          </div>
+          <p class="mt-1 text-sm leading-relaxed text-ink/75">睡前一句话，AI 帮你轻轻总结今天、温柔开启明天。</p>
+        </div>
+        <span class="text-xl text-terracotta">→</span>
+      </button>
+    </section>
+
+    <!-- 底部引导 -->
+    <footer class="fade-up delay-4 mt-12 text-center">
+      <p class="text-xs leading-relaxed text-muted">把网页加到主屏或收藏夹，每天回来一次，<br class="sm:hidden" />让它陪你慢慢过好每一天。</p>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // 问候 + 日期（按真实时间）
+    (function () {
+      const now = new Date();
+      const week = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+      const y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
+      document.getElementById('dateLabel').textContent = `${y}年${m}月${d}日 · ${week[now.getDay()]}`;
+      const h = now.getHours();
+      let g = '晚上好';
+      if (h < 5) g = '夜深了';
+      else if (h < 11) g = '早上好';
+      else if (h < 14) g = '中午好';
+      else if (h < 18) g = '下午好';
+      document.getElementById('greeting').textContent = `${g}，今天也想好好照顾自己呀`;
+    })();
+
+    // 每日一句话随机
+    const quotes = [
+      '“把今天过成自己喜欢的样子，就是一种温柔的自律。”',
+      '“慢慢来，比较快。”',
+      '“你不需要完美，只需要开始。”',
+      '“照顾好自己，是今天最重要的事。”',
+      '“小小的确定感，也能撑起一整天的好心情。”',
+      '“今天的你，已经很努力了。”',
+    ];
+    let qi = Math.floor(Math.random() * quotes.length);
+    function rotateQuote() {
+      const el = document.getElementById('quote');
+      el.style.opacity = 0;
+      setTimeout(() => { el.textContent = quotes[qi]; el.style.opacity = 1; qi = (qi + 1) % quotes.length; }, 600);
+    }
+    setInterval(rotateQuote, 6000);
+
+    // toast
+    let toastTimer;
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+  </script>
+</body>
+</html>
