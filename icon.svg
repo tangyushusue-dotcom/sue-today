@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- 圆角底 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F4A6A0"/>
+      <stop offset="100%" stop-color="#E7A08C"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)"/>
+
+  <!-- 花瓣 -->
+  <g transform="translate(256,220)">
+    <ellipse cx="0" cy="-52" rx="28" ry="42" fill="#FFF" opacity="0.9"/>
+    <ellipse cx="45" cy="-26" rx="28" ry="42" fill="#FFF" opacity="0.85" transform="rotate(72)"/>
+    <ellipse cx="28" cy="38" rx="28" ry="42" fill="#FFF" opacity="0.85" transform="rotate(144)"/>
+    <ellipse cx="-28" cy="38" rx="28" ry="42" fill="#FFF" opacity="0.85" transform="rotate(216)"/>
+    <ellipse cx="-45" cy="-26" rx="28" ry="42" fill="#FFF" opacity="0.85" transform="rotate(288)"/>
+    <!-- 花心 -->
+    <circle cx="0" cy="0" r="26" fill="#FFF7E6"/>
+  </g>
+
+  <!-- 小叶子 -->
+  <path d="M256 300 Q310 370 270 400 Q240 370 256 300Z" fill="#A9C5A0" opacity="0.8"/>
+  <path d="M256 300 Q200 370 242 400 Q272 370 256 300Z" fill="#A9C5A0" opacity="0.7"/>
+
+  <!-- 底部文字 -->
+  <text x="256" y="440" text-anchor="middle" font-family="system-ui, sans-serif" font-size="64" font-weight="600" fill="#FFF" opacity="0.95">Sue</text>
+</svg>
