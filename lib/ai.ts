@@ -2,8 +2,10 @@ import { moduleSchemas } from "./schemas";
 import { SYSTEM_PROMPTS, SCHEMA_EXAMPLES } from "./prompts";
 import type { ModuleKey, AIContext } from "@/types";
 
-const BASE = process.env.AI_BASE_URL || "https://api.deepseek.com/v1";
-const MODEL = process.env.AI_MODEL || "deepseek-chat";
+/** 浏览器端没有 process，做安全读取 */
+function getEnv(key: string): string | undefined {
+  return typeof process !== "undefined" ? process.env?.[key] : undefined;
+}
 
 function userContent(module: ModuleKey, input: string, ctx?: AIContext): string {
   const parts = [`今天她说：「${input}」`];
@@ -21,8 +23,11 @@ export async function generate(
   input: string,
   ctx?: AIContext
 ): Promise<unknown> {
-  const key = process.env.AI_API_KEY;
+  const key = getEnv("AI_API_KEY");
   if (!key) return mock(module, input, ctx);
+
+  const BASE = getEnv("AI_BASE_URL") || "https://api.deepseek.com/v1";
+  const MODEL = getEnv("AI_MODEL") || "deepseek-chat";
 
   const sys =
     SYSTEM_PROMPTS[module] +

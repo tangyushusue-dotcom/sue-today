@@ -24,7 +24,7 @@ export async function generateClient(
       await new Promise((r) => setTimeout(r, 600 + Math.random() * 400));
 
       try {
-        const result = generate(module, input, ctx);
+        const result = await generate(module, input, ctx);
         send({ type: "result", result });
       } catch {
         send({ type: "error", error: "生成失败了，稍后再试一次～" });

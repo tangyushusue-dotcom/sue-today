@@ -48,7 +48,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <PageShell title="欢迎来到Sue的今天 🌸">
+    <PageShell title="欢迎来到 Sue 🌸">
       <p className="mt-4 max-w-md text-sm leading-relaxed text-muted">
         只需要几秒，让我更懂你。所有选项都可以跳过，随时在设置里改。
       </p>

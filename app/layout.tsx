@@ -7,7 +7,7 @@ import "./globals.css";
 const ICON_BASE = "./";
 
 export const metadata: Metadata = {
-  title: "Sue的今天",
+  title: "Sue",
   description: "女生的一天，从这里开始。规划今天、照顾自己、好好出门。",
   icons: {
     icon: `${ICON_BASE}favicon-32.png`,
@@ -17,14 +17,13 @@ export const metadata: Metadata = {
   manifest: `${ICON_BASE}manifest.json`,
   appleWebApp: {
     capable: true,
-    title: "Sue的今天",
+    title: "Sue",
     statusBarStyle: "default",
   },
   other: {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
-    "apple-mobile-web-app-title": "Sue的今天",
     "format-detection": "telephone=no",
   },
 };
@@ -53,7 +52,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#F4A6A0" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Sue的今天" />
+        <meta name="apple-mobile-web-app-title" content="Sue" />
         <meta name="format-detection" content="telephone=no" />
       </head>
       <body className="font-sans text-ink antialiased">{children}</body>

@@ -82,7 +82,7 @@ export default function HomePage() {
       <header className="fade-up flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="grid h-9 w-9 place-items-center rounded-2xl bg-white/70 text-lg shadow-card">🌸</div>
-          <span className="font-serif text-lg font-medium tracking-wide">Sue的今天</span>
+          <span className="font-serif text-lg font-medium tracking-wide">Sue</span>
         </div>
         <div className="flex items-center gap-3">
           <StreakBadge streak={streak} />

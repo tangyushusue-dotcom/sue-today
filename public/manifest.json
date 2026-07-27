@@ -1,6 +1,6 @@
 {
-  "name": "Sue的今天",
-  "short_name": "Sue的今天",
+  "name": "Sue",
+  "short_name": "Sue",
   "description": "女生的一天，从这里开始",
   "start_url": "./",
   "scope": "./",
