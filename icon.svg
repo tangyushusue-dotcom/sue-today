@@ -6,7 +6,7 @@
       <stop offset="100%" stop-color="#E7A08C"/>
     </linearGradient>
   </defs>
-  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)"/>
+  <rect x="0" y="0" width="512" height="512" rx="0" fill="url(#bg)"/>
 
   <!-- 花瓣 -->
   <g transform="translate(256,220)">
