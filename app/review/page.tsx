@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { PageShell } from "@/components/PageShell";
 import { Card } from "@/components/ui/Card";
 import { saveModuleResult, getDaily } from "@/lib/db";
+import { generateClient } from "@/lib/ai-client";
+import { parseSSEStream } from "@/lib/sse-helper";
 import { todayKey } from "@/lib/time";
 import type { ReviewResult, PlannerResult } from "@/types";
 
@@ -36,34 +38,12 @@ export default function ReviewPage() {
     const ctxInput = todayPlan ? `${text}\n（${todayPlan}）` : text;
 
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ module: "review", input: ctxInput }),
-      });
-      if (!res.body) throw new Error("no body");
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const frames = buf.split("\n\n");
-        buf = frames.pop() || "";
-        for (const frame of frames) {
-          if (!frame.startsWith("data: ")) continue;
-          const evt = JSON.parse(frame.slice(6));
-          if (evt.type === "result") {
-            const r = evt.result as ReviewResult;
-            setResult(r);
-            saveModuleResult("review", r);
-            setSaved(true);
-          } else if (evt.type === "error") {
-            setError(evt.error || "生成失败了，稍后再试一次～");
-          }
-        }
-      }
+      const stream = await generateClient("review", ctxInput);
+      await parseSSEStream<ReviewResult>(stream, (r) => {
+        setResult(r);
+        saveModuleResult("review", r);
+        setSaved(true);
+      }, setError);
     } catch { setError("生成失败了，稍后再试一次～"); }
     finally { setLoading(false); }
   }

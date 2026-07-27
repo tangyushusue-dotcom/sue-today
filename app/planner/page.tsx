@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { PageShell } from "@/components/PageShell";
 import { Card } from "@/components/ui/Card";
 import { saveModuleResult, getTodayTodos, saveTodayTodos } from "@/lib/db";
+import { generateClient } from "@/lib/ai-client";
+import { parseSSEStream } from "@/lib/sse-helper";
 import type { PlannerResult, PlannerTodo } from "@/types";
 
 const EXAMPLES = [
@@ -90,33 +92,11 @@ export default function PlannerPage() {
     }
 
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ module: "planner", input: aiInput }),
-      });
-      if (!res.body) throw new Error("no body");
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const frames = buf.split("\n\n");
-        buf = frames.pop() || "";
-        for (const frame of frames) {
-          if (!frame.startsWith("data: ")) continue;
-          const evt = JSON.parse(frame.slice(6));
-          if (evt.type === "result") {
-            const r = evt.result as PlannerResult;
-            setResult(r);
-            saveModuleResult("planner", r);
-          } else if (evt.type === "error") {
-            setError(evt.error || "生成失败了，稍后再试一次～");
-          }
-        }
-      }
+      const stream = await generateClient("planner", aiInput);
+      await parseSSEStream<PlannerResult>(stream, (r) => {
+        setResult(r);
+        saveModuleResult("planner", r);
+      }, setError);
     } catch { setError("生成失败了，稍后再试一次～"); }
     finally { setLoading(false); }
   }

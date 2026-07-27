@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { PageShell } from "@/components/PageShell";
 import { Card } from "@/components/ui/Card";
 import { saveModuleResult } from "@/lib/db";
+import { generateClient, getWeatherClient } from "@/lib/ai-client";
+import { parseSSEStream } from "@/lib/sse-helper";
 import { useAppStore } from "@/lib/store";
 import type { LookResult } from "@/types";
 
@@ -23,50 +25,24 @@ export default function LookPage() {
 
   useEffect(() => { if (!loaded) loadPrefs(); }, [loaded, loadPrefs]);
 
-  // 自动获取天气
+  // 自动获取天气（客户端 mock）
   useEffect(() => {
     const city = prefs?.city || "上海";
-    fetch(`/api/weather?city=${encodeURIComponent(city)}`)
-      .then((r) => r.json())
-      .then((d) => setWeather({ temp: d.temp, desc: d.desc }))
-      .catch(() => setWeather(null));
+    getWeatherClient(city).then(setWeather);
   }, [prefs?.city]);
 
   async function run() {
     const s = customScene.trim() || scene;
     setLoading(true); setError(""); setResult(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          module: "look",
-          input: s,
-          context: { weather: weather ?? undefined, prefs: { city: prefs?.city } },
-        }),
+      const stream = await generateClient("look", s, {
+        weather: weather ?? undefined,
+        prefs: { city: prefs?.city },
       });
-      if (!res.body) throw new Error("no body");
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const frames = buf.split("\n\n");
-        buf = frames.pop() || "";
-        for (const frame of frames) {
-          if (!frame.startsWith("data: ")) continue;
-          const evt = JSON.parse(frame.slice(6));
-          if (evt.type === "result") {
-            const r = evt.result as LookResult;
-            setResult(r);
-            saveModuleResult("look", r);
-          } else if (evt.type === "error") {
-            setError(evt.error || "生成失败了，稍后再试一次～");
-          }
-        }
-      }
+      await parseSSEStream<LookResult>(stream, (r) => {
+        setResult(r);
+        saveModuleResult("look", r);
+      }, setError);
     } catch { setError("生成失败了，稍后再试一次～"); }
     finally { setLoading(false); }
   }

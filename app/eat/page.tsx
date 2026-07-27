@@ -4,6 +4,8 @@ import { useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { Card } from "@/components/ui/Card";
 import { saveModuleResult } from "@/lib/db";
+import { generateClient } from "@/lib/ai-client";
+import { parseSSEStream } from "@/lib/sse-helper";
 import type { EatResult } from "@/types";
 
 const EXAMPLES = ["想吃辣，两个人，预算80", "想吃清淡的，一个人", "今晚想吃点特别的，预算不限"];
@@ -19,33 +21,11 @@ export default function EatPage() {
     if (!text) { setError("告诉我口味、人数和预算吧～"); return; }
     setLoading(true); setError(""); setResult(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ module: "eat", input: text }),
-      });
-      if (!res.body) throw new Error("no body");
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const frames = buf.split("\n\n");
-        buf = frames.pop() || "";
-        for (const frame of frames) {
-          if (!frame.startsWith("data: ")) continue;
-          const evt = JSON.parse(frame.slice(6));
-          if (evt.type === "result") {
-            const r = evt.result as EatResult;
-            setResult(r);
-            saveModuleResult("eat", r);
-          } else if (evt.type === "error") {
-            setError(evt.error || "生成失败了，稍后再试一次～");
-          }
-        }
-      }
+      const stream = await generateClient("eat", text);
+      await parseSSEStream<EatResult>(stream, (r) => {
+        setResult(r);
+        saveModuleResult("eat", r);
+      }, setError);
     } catch { setError("生成失败了，稍后再试一次～"); }
     finally { setLoading(false); }
   }

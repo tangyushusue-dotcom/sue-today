@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { PageShell } from "@/components/PageShell";
 import { Card } from "@/components/ui/Card";
 import { saveModuleResult } from "@/lib/db";
+import { generateClient } from "@/lib/ai-client";
+import { parseSSEStream } from "@/lib/sse-helper";
 import { useAppStore } from "@/lib/store";
 import Link from "next/link";
 import type { WorkoutResult } from "@/types";
@@ -22,39 +24,13 @@ export default function WorkoutPage() {
   async function run() {
     setLoading(true); setError(""); setResult(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          module: "workout",
-          input: "今天适合什么运动？",
-          context: {
-            prefs: { goal: prefs?.goal, workoutDaysPerWeek: prefs?.workoutDaysPerWeek },
-          },
-        }),
+      const stream = await generateClient("workout", "今天适合什么运动？", {
+        prefs: { goal: prefs?.goal, workoutDaysPerWeek: prefs?.workoutDaysPerWeek },
       });
-      if (!res.body) throw new Error("no body");
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const frames = buf.split("\n\n");
-        buf = frames.pop() || "";
-        for (const frame of frames) {
-          if (!frame.startsWith("data: ")) continue;
-          const evt = JSON.parse(frame.slice(6));
-          if (evt.type === "result") {
-            const r = evt.result as WorkoutResult;
-            setResult(r);
-            saveModuleResult("workout", r);
-          } else if (evt.type === "error") {
-            setError(evt.error || "生成失败了，稍后再试一次～");
-          }
-        }
-      }
+      await parseSSEStream<WorkoutResult>(stream, (r) => {
+        setResult(r);
+        saveModuleResult("workout", r);
+      }, setError);
     } catch { setError("生成失败了，稍后再试一次～"); }
     finally { setLoading(false); }
   }
